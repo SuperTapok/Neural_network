@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image
 
-im = Image.open('buldogek.jpg')  # Can be many different formats.
+im = Image.open('puppy.jpg')  # Can be many different formats.
 im2arr = np.array(im)
 
 for h in range(im2arr.shape[0]):
@@ -24,5 +24,5 @@ for h in range(im2arr.shape[0]):
             #      im2arr[h, w, c] = tmp
 
 img = Image.fromarray(im2arr, 'RGB')
-img.save('buldogek.png')
+img.save('puppy.png')
 img.show()
