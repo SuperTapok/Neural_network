@@ -3,33 +3,33 @@ from PIL import Image
 import random
 
 
-def conv(color, core):
+def conv(color, core, arr):
     exp_list = []
-    for i in range(im2arr.shape[0]):
+    for i in range(arr.shape[0]):
         exp_list.append([])
-        for j in range(im2arr.shape[1]):
-            exp_list[i].append(im2arr[i, j, color])
+        for j in range(arr.shape[1]):
+            exp_list[i].append(arr[i, j, color])
 
-    for i in range(im2arr.shape[0]):
-        exp_list[i].insert(0, im2arr[i, 0, color])
-        exp_list[i].append(im2arr[i, im2arr.shape[1]-1, color])
+    for i in range(arr.shape[0]):
+        exp_list[i].insert(0, arr[i, 0, color])
+        exp_list[i].append(arr[i, arr.shape[1]-1, color])
 
-    a_list = [im2arr[0, 0, color]]  #adding the first expended row
-    for i in range(0, im2arr.shape[1]):
-        a_list.append(im2arr[0, i, color])
-    a_list.append(im2arr[0, im2arr.shape[1]-1, color])
+    a_list = [arr[0, 0, color]]  #adding the first expended row
+    for i in range(0, arr.shape[1]):
+        a_list.append(arr[0, i, color])
+    a_list.append(arr[0, arr.shape[1]-1, color])
     exp_list.insert(0, a_list)
 
-    b_list = [im2arr[0, im2arr.shape[0]-1, color]]  #adding the last expended row
-    for i in range(0, im2arr.shape[0]):
-        b_list.append(im2arr[i, im2arr.shape[1]-1, color])
-    b_list.append(im2arr[im2arr.shape[0]-1, im2arr.shape[1]-1])
+    b_list = [arr[0, arr.shape[0]-1, color]]  #adding the last expended row
+    for i in range(0, arr.shape[0]):
+        b_list.append(arr[i, arr.shape[1]-1, color])
+    b_list.append(arr[arr.shape[0]-1, arr.shape[1]-1])
     exp_list.insert(len(exp_list[0]), b_list)
 
     conv_list = []
-    for i in range(0, im2arr.shape[0]-1):
+    for i in range(0, arr.shape[0]-1):
         conv_list.append([])
-        for j in range(0, im2arr.shape[1]-1):
+        for j in range(0, arr.shape[1]-1):
             k = 0
             tmp = 0
             for h in range(len(core[0])):
@@ -56,14 +56,15 @@ for i in range(3):
         core_list[i].append(random.randint(0, 1))
     print(core_list[i])
 new_image = []
-red_list = conv(0, core_list)
-green_list = conv(1, core_list)
-blue_list = conv(2, core_list)
+red_list = conv(0, core_list, im2arr)
+green_list = conv(1, core_list, im2arr)
+blue_list = conv(2, core_list, im2arr)
 for i in range(len(red_list)):
     new_image.append([])
     for j in range(len(red_list)):
         new_image[i].append([red_list[i][j], green_list[i][j], blue_list[i][j]])
-new_image_arr = np.array(new_image)
+new_image_arr = np.array(new_image, "uint8")
 img = Image.fromarray(new_image_arr, 'RGB')
 img.save('new_example_image.png')
 img.show()
+
