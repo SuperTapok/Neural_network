@@ -49,3 +49,15 @@ for i in range(orig_list.shape[0]):
         conv_list[i][j] = k
 print(conv_list)
 
+print("Convolutional list: ")
+#creating a convolutional list
+conv_list = np.zeros((orig_list.shape[0], orig_list.shape[1]), dtype=int)
+for i in range(orig_list.shape[0]):
+    for j in range(orig_list.shape[1]):
+        k = 0
+        for h in range(core_list.shape[0]):
+            for l in range(core_list.shape[1]):
+                k = k + exp_list[h+i][l+j]*core_list[h][l]
+        conv_list[i][j] = k
+print(conv_list)
+
