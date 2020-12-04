@@ -45,7 +45,7 @@ def conv(color, core, arr):
     return conv_list
 
 
-image = Image.open('puppy.jpg')
+image = Image.open('example_image.jpg')
 image.show()
 im2arr = np.array(image)
 print("Generating the core: ")
@@ -61,6 +61,6 @@ for i in range(red_list.shape[0]):
         new_image[i][j] = red_list[i][j], green_list[i][j], blue_list[i][j]
 new_image_arr = np.array(new_image, "uint8")
 img = Image.fromarray(new_image_arr, 'RGB')
-img.save('new_example_image.png')
+img.save('new_example_image.jpg')
 img.show()
 
