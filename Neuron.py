@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def f_of_act(x):
+def func_of_act(x):
     return 1/(1+np.exp(-x))
 
 
@@ -24,5 +24,5 @@ for i in range(input_values.shape[0]):
         sum_list[j] = sum
 y_list = np.zeros(f, dtype=float)
 for i in range(f):
-    y_list[i] = f_of_act(sum_list[i])
+    y_list[i] = func_of_act(sum_list[i])
 print("Output values:", y_list)
