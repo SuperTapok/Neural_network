@@ -1,21 +1,27 @@
-import random
-import math
+import numpy as np
 
-previous_layer_list = [random.randint(0, 10), random.randint(0, 10), random.randint(0, 10)]
-print("Previous layer: ", previous_layer_list)
-x = int(input("Enter number of neurons:"))
-weights_list = []
-for i in range(x):
-    weights_list.append([random.randint(0, 2), random.randint(0, 2), random.randint(0, 2)])
-print("Weights: ", weights_list)
-sum_list = []
-for i in range(len(previous_layer_list)):
-    for j in range(x):
+def f_of_act(x):
+    return 1/(1+np.exp(-x))
+
+
+input_values = np.random.randint(0, 10, size=3)
+print("Input values: ", input_values)
+
+f = int(input("Enter number of neurons: "))
+
+weights = np.zeros((f, 3), dtype=int)
+for i in range(f):
+    weights[i] = np.random.randint(0, 2), np.random.randint(0, 2), np.random.randint(0, 2)
+print("Weights: ", weights)
+
+sum_list = np.zeros(f, dtype=int)
+for i in range(input_values.shape[0]):
+    for j in range(f):
         sum = 0
         for k in range(3):
-            sum = sum + previous_layer_list[i]*weights_list[j][k]
-        sum_list.append(sum)
-y_list = []
-for i in range(x):
-    y_list.append(1/(1+math.exp(-sum_list[i])))
+            sum = sum + input_values[i]*weights[j][k]
+        sum_list[i] = sum
+y_list = np.zeros(f, dtype=int)
+for i in range(f):
+    y_list[i] = f_of_act(sum_list[i])
 print("Output values:", y_list)
