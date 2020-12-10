@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def f_of_act(x):
     return 1/(1+np.exp(-x))
 
@@ -20,8 +21,8 @@ for i in range(input_values.shape[0]):
         sum = 0
         for k in range(3):
             sum = sum + input_values[i]*weights[j][k]
-        sum_list[i] = sum
-y_list = np.zeros(f, dtype=int)
+        sum_list[j] = sum
+y_list = np.zeros(f, dtype=float)
 for i in range(f):
     y_list[i] = f_of_act(sum_list[i])
 print("Output values:", y_list)
