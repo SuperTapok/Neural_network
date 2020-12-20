@@ -1,0 +1,26 @@
+import numpy as np
+from Neuron import Neuron
+
+
+class NeuronLayer:
+    def __init__(self, previous_values, neurons):
+        self.__previous_layer = previous_values
+        self._neurons = neurons
+
+    def __calc(self):
+        list = []
+        for i in self._neurons:
+            list.append(i.get_result())
+        return list
+
+    def print(self):
+        print(self.__calc())
+
+
+# list_of_input_values = [1, 0, 0, 1, 0]
+# list_of_neurons = []
+# for i in range(10):
+#     new_neuron = Neuron(np.array(list_of_input_values))
+#     list_of_neurons.append(new_neuron)
+# new_layer = NeuronLayer(np.array(list_of_input_values), np.array(list_of_neurons))
+# new_layer.print()
