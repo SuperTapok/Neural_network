@@ -1,28 +1,27 @@
 import numpy as np
 
 
-def func_of_act(x):
-    return 1/(1+np.exp(-x))
+class Neuron:
 
+    def __init__(self, _previous_values):
+        self._previous_values = _previous_values
+        self._weights = np.random.random(_previous_values.shape[0])
+        self.output = None
 
-input_values = np.random.randint(0, 10, size=3)
-print("Input values: ", input_values)
+    def __summa(self):
+        sum = 0.0
+        for i in range(len(self._previous_values)):
+                sum = sum + self._previous_values[i]*self._weights[i]
+        return sum
 
-f = int(input("Enter number of neurons: "))
+    def __func_of_act(self, value):
+        return 1/(1+np.exp((-1) * value))
 
-weights = np.zeros((f, 3), dtype=int)
-for i in range(f):
-    weights[i] = np.random.randint(0, 2), np.random.randint(0, 2), np.random.randint(0, 2)
-print("Weights: ", weights)
+    def get_result(self):
+        if self.output is None:
+            self.output = self.__func_of_act(self.__summa())
+        return self.output
 
-sum_list = np.zeros(f, dtype=int)
-for i in range(input_values.shape[0]):
-    for j in range(f):
-        sum = 0
-        for k in range(3):
-            sum = sum + input_values[i]*weights[j][k]
-        sum_list[j] = sum
-y_list = np.zeros(f, dtype=float)
-for i in range(f):
-    y_list[i] = func_of_act(sum_list[i])
-print("Output values:", y_list)
+    def recalc(self):
+        self.output = self.__func_of_act(self.__summa())
+        return self.output
