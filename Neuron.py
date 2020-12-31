@@ -25,9 +25,3 @@ class Neuron:
     def recalc(self):
         self.output = self.__func_of_act(self.__summa())
         return self.output
-
-
-previous_values = np.random.random(3)
-new_Neuron = Neuron(previous_values)
-print("Output value: {}".format(new_Neuron.get_result()))
-print("Recalculated value: {}".format(new_Neuron.recalc()))
