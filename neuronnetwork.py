@@ -20,13 +20,9 @@ class Neuron:
 class InputNeuron(Neuron):
     def __init__(self):
         super().__init__()
-        self.input_value = None
 
     def set_input_value(self, value):
-        self.input_value = value
-
-    def get_result_neuron(self):
-        return self.input_value
+        self.__output = value
 
 
 class OutputNeuron(Neuron):
@@ -43,7 +39,7 @@ class OutputNeuron(Neuron):
     def __summa(self):
         summ = 0.0
         try:
-            if  self._previous_neurons.shape[0] != self._weights.shape[0]:
+            if self._previous_neurons.shape[0] != self._weights.shape[0]:
                 raise NeuralNetworkError("Number of weights and input values are different!")
             else:
                 for i in range(len(self._previous_neurons)):
@@ -60,8 +56,7 @@ class OutputNeuron(Neuron):
         self.__output = self.__func_of_act(self.__summa())
         return self.__output
 
-    def get_result_neuron(self, input_values):
-        self._previous_values = input_values
+    def get_result_neuron(self):
         # if self._weights is None:
         #     self.__set_weights()
         if self.__output is None:
@@ -73,19 +68,18 @@ class OutputNeuron(Neuron):
 class NeuronLayer:
     def __init__(self, neurons):
         self._neurons = neurons
-        self.__input_values = None
         self.__result_list = []
 
     def __calc_layer(self):
         for i in self._neurons:
-            self.__result_list.append(i.get_result_neuron(self.__input_values))
+            self.__result_list.append(i.get_result_neuron())
         return np.array(self._neurons)
 
-    # def recalc_layer(self):
-    #
-
-    def get_result_layer(self, input_values):
-        self.__input_values = input_values
+    def set_input_value(self, input_values):
+        for i in range(len(input_values)):
+            self._neurons[i].set_input_value(input_values[i])
+        
+    def get_result_layer(self):
         self.__calc_layer()
         return self.__result_list
 
@@ -93,18 +87,17 @@ class NeuronLayer:
 class NeuronNetwork:
     def __init__(self, layers):
         self.__layers = layers
-        self.__input_values = None
         self.__result = []
 
-    def __calc_net(self):
-        for i in self.__layers:
-            self.__result = i.get_result_layer(self.__input_values)
+    def __calc(self, input_values):
+        self.__layers[0].set_input_value(input_values)
+        for i in range(1, self.__layers):
+            self.__result = self.__layers[i].get_result_layer()
         return self.__layers
 
     def get_result_net(self, input_values):
-        self.__input_values = input_values
         if len(self.__result) == 0:
-            self.__calc_net()
+            self.__calc(input_values)
             return self.__result
         else:
             return self.__result
@@ -147,7 +140,7 @@ class NeuronNetworkFactory:
         return new_input_neuron
 
     def _create_output_neuron(self):
-        new_output_neuron = OutputNeuron(self._set_weights())
+        new_output_neuron = OutputNeuron( , self._set_weights())  # ???
         return new_output_neuron
 
     def _set_weights(self):
