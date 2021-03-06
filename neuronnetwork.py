@@ -24,13 +24,14 @@ class InputNeuron(Neuron):
     def set_input_value(self, value):
         self.__output = value
 
+    def get_result_input_neuron(self):
+        return self.__output
+
 
 class OutputNeuron(Neuron):
-    def __init__(self, previous_neurons, weights):
+    def __init__(self,  weights, old_neurons):
         super().__init__(weights)
-        self._previous_neurons = previous_neurons
-        # for i in range(len(self.__list)):
-        #     self.__list[i] =
+        self.__old_neurons = old_neurons
         self._weights = weights
         self.__output = None
 
@@ -38,33 +39,28 @@ class OutputNeuron(Neuron):
     def __func_of_act(value):
         return 1.0 / (1.0 + np.exp((-1.0) * value))
 
-    def __summa(self, k):
-        summ = 0.0
+    def __sum(self, k):
+        sum = 0.0
         try:
             if k.shape[0] != self._weights.shape[0]:
                 raise NeuralNetworkError("Number of weights and input values are different!")
             else:
                 for i in range(k.shape[0]):
-                    summ = summ + k[i] * self._weights[i]
-                return summ
+                    sum = sum + k[i] * self._weights[i]
+                return sum
 
         except NeuralNetworkError as nne:
             print(nne)
 
-    # def __set_weights(self):  # in this method you can set necessary weights
-    #     self._weights = np.random.random(self._previous_values.shape[0])
-
-    def recalc(self, k):
-        self.__output = self.__func_of_act(self.__summa(k))
+    def re_calc(self, k):
+        self.__output = self.__func_of_act(self.__sum(k))
         return self.__output
 
-    def get_result_neuron(self):  # TODO all list convert to numpy array
-        # if self._weights is None:
-        #     self.__set_weights()
-        k = np.array(self._previous_neurons.get_result_layer())
+    def get_result_neuron(self):
+        k = np.array(self.__old_neurons.get_result_layer())
         if self.__output is None:
-            if self.__summa(k) is not None:
-                self.__output = self.__func_of_act(self.__summa(k))
+            if self.__sum(k) is not None:
+                self.__output = self.__func_of_act(self.__sum(k))
         return self.__output
 
 
@@ -84,13 +80,10 @@ class NeuronLayer:
                 raise NeuralNetworkError("Number of neurons and input values are different!")
             else:
                 for i in range(len(input_values)):
-                   self._neurons[i].set_input_value(input_values[i])
-                   self.__result_list.append(self._neurons[i].get_result_neuron())
+                    self._neurons[i].set_input_value(input_values[i])
+                    self.__result_list.append(self._neurons[i].get_result_input_neuron())
         except NeuralNetworkError as e:
             print(e)
-
-    # def shape(self):
-    #     return len(self._neurons)
 
     def get_result_layer(self):
         if len(self.__result_list) == 0:
@@ -107,6 +100,7 @@ class NeuronNetwork:
 
     def __calc(self, input_values):
         self.__layers[0].set_input_value(input_values)
+        self.__result = self.__layers[0].get_result_layer()
         for i in range(1, len(self.__layers)):
             self.__result = self.__layers[i].get_result_layer()
         return self.__layers
@@ -149,21 +143,23 @@ class NeuronNetworkFactory:
             neurons_list.append(self._create_output_neuron(old_neurons))
         return neurons_list
 
-    def _create_input_neuron(self):
+    @staticmethod
+    def _create_input_neuron():
         new_input_neuron = InputNeuron()
         return new_input_neuron
 
     def _create_output_neuron(self, old_neurons):
-        new_output_neuron = OutputNeuron(old_neurons, self._set_weights())  # ???
+        new_output_neuron = OutputNeuron(self._set_weights(), old_neurons)
         return new_output_neuron
 
-    def _set_weights(self):
-        new_weights = [1, 0, 1, 0]
+    @staticmethod
+    def _set_weights():
+        new_weights = [0, 0, 0, 0]
         return np.array(new_weights)
 
 
-INPUT_VALUES = [0, 1, 0, 1]
-LAYER_NUM = 5
+INPUT_VALUES = [0, 0, 0, 0]
+LAYER_NUM = 10
 NEURONS_NUM = 4
 new_factory = NeuronNetworkFactory()
 new_net = new_factory.create_net(LAYER_NUM, NEURONS_NUM)
