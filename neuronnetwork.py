@@ -1,8 +1,14 @@
 import numpy as np
+import random
 
 
 class NeuralNetworkError(Exception):
     def __init__(self, text):
+        self.__txt = text
+
+
+class LoadingException(Exception):
+    def __init(self, text):
         self.__txt = text
 
 
@@ -39,6 +45,12 @@ class OutputNeuron(Neuron):
     def __func_of_act(value):
         return 1.0 / (1.0 + np.exp((-1.0) * value))
 
+    def __str__(self):
+        f = ""
+        for i in self._weights:
+            f = f + str(i)+" "
+        return f
+
     def __sum(self, k):
         sum = 0.0
         try:
@@ -64,7 +76,8 @@ class OutputNeuron(Neuron):
         return self.__output
 
     def save_weights(self):
-        pass  # TODO realisation of saving weights in txt file 
+        with open('weights.txt', 'a') as file:
+            file.writelines("{0}\n".format(str(self)))
 
 
 class NeuronLayer:
@@ -98,6 +111,8 @@ class NeuronLayer:
     def save_weights(self):
         for i in self.__neurons:
             i.save_weights()
+        with open('weights.txt', 'a') as file:
+            file.writelines("\n")
 
 
 class NeuronNetwork:
@@ -120,22 +135,29 @@ class NeuronNetwork:
             return self.__result
 
     def save_weights(self):
-        for i in range(1, self.__layers):
+        for i in range(1, len(self.__layers)):
             self.__layers[i].save_weights()
 
 
 class NeuronNetworkFactory:
-    def create_net(self, layer_num, neurons_num):
-        new_network = NeuronNetwork(self.__create_layers(layer_num, neurons_num))
+    def create_net(self, layer_num, neurons_num, load_weights=False):
+        if load_weights is True:
+            new_network = NeuronNetwork(self.__create_layers(layer_num, neurons_num, True))
+        else:
+            new_network = NeuronNetwork(self.__create_layers(layer_num, neurons_num))
         print("New network was created")
         return new_network
 
-    def __create_layers(self, layer_num, neurons_num):
+    def __create_layers(self, layer_num, neurons_num, load_weights=False):
         layers_list = [self.__create_input_layer(neurons_num)]
-        for i in range(1, layer_num):
-            new_neurons = self.__create_neurons(neurons_num, layers_list[i - 1])
-            new_layer = NeuronLayer(new_neurons)
-            layers_list.append(new_layer)
+        if load_weights is True:
+            for i in range(1, layer_num):
+                new_neurons = self.__create_neurons(neurons_num, layers_list[i - 1], True)
+        else:
+            for i in range(1, layer_num):
+                new_neurons = self.__create_neurons(neurons_num, layers_list[i - 1])
+        new_layer = NeuronLayer(new_neurons)
+        layers_list.append(new_layer)
         return layers_list
 
     def __create_input_layer(self, neurons_num):
@@ -148,10 +170,14 @@ class NeuronNetworkFactory:
             neurons_list.append(self.__create_input_neuron())
         return neurons_list
 
-    def __create_neurons(self, neurons_num, old_neurons):
+    def __create_neurons(self, neurons_num, old_neurons, load_weights=False):
         neurons_list = []
-        for i in range(neurons_num):
-            neurons_list.append(self.__create_output_neuron(old_neurons))
+        if load_weights is True:
+            for i in range(neurons_num):
+                neurons_list.append(self.__create_output_neuron(old_neurons, True))
+        else:
+            for i in range(neurons_num):
+                neurons_list.append(self.__create_output_neuron(old_neurons))
         return neurons_list
 
     @staticmethod
@@ -159,18 +185,31 @@ class NeuronNetworkFactory:
         new_input_neuron = InputNeuron()
         return new_input_neuron
 
-    def __create_output_neuron(self, old_neurons):
-        new_output_neuron = OutputNeuron(self.__set_weights(), old_neurons)
+    def __create_output_neuron(self, old_neurons, load_weights=True):
+        if load_weights is True:
+            new_output_neuron = OutputNeuron(self.__load_weights(), old_neurons)
+        else:
+            new_output_neuron = OutputNeuron(self.__set_weights(), old_neurons)
         return new_output_neuron
 
     @staticmethod
+    def __load_weights():
+        with open('weights.txt') as f:
+            try:
+                float(f.read(1))
+            except ValueError:
+                raise LoadingException("Weights.txt is empty!")
+            else:
+                pass
+
+    @staticmethod
     def __set_weights():
-        new_weights = [0, 0, 0, 0, 0]
+        new_weights = [random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1)]
         return np.array(new_weights)
 
 
 INPUT_VALUES = [0, 0, 0, 0]
-LAYER_NUM = 10
+LAYER_NUM = 5
 NEURONS_NUM = 4
 if NEURONS_NUM != len(INPUT_VALUES):
     print("Neural Network error! Check numbers of neurons and input values")
@@ -178,3 +217,4 @@ else:
     new_factory = NeuronNetworkFactory()
     new_net = new_factory.create_net(LAYER_NUM, NEURONS_NUM)
     print(new_net.get_result_net(np.array(INPUT_VALUES)))
+    new_net.save_weights()
