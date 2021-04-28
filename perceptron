@@ -1,0 +1,116 @@
+import math
+import random
+
+
+class Neuron:
+    def __init__(self, is_input=False):
+        self.__weights = []
+        self.__is_input = is_input
+        self.out_put = None
+
+    @staticmethod
+    def __activation_func(value):
+        return 1 / (1 + math.exp(value))
+
+    def __set_weights(self, input_values):
+        for i in range(len(input_values)):
+            self.__weights.append(random.random())
+
+    def __calculate(self, input_values):
+        sum = 0
+        for i in range(len(input_values)):
+            sum += self.__weights[i]*input_values[i]
+        return sum
+
+    def __calculate_input(self, input_values):
+        self.out_put = input_values
+
+    def calc_delta_output(self, prev_result, answer):
+        # calculating the gradient
+        b = (answer - self.out_put) * ((answer - self.out_put) * self.out_put)
+        grad = prev_result * b
+        # calculating the delta
+        delta_w = 0.7 * grad + 0.3 * 0
+        return delta_w
+
+    def get_result(self, input_values):
+        if self.__is_input:
+            self.__calculate_input(input_values)
+            return self.out_put
+        else:
+            self.__set_weights(input_values)
+            self.out_put = self.__activation_func(self.__calculate(input_values))
+            return self.out_put
+
+
+class Layer:
+    def __init__(self, neurons):
+        self.neurons = neurons
+
+    def get_result_layer(self, input_value):
+        out_put = []
+        for i in self.neurons:
+            out_put.append(i.get_result(input_value))
+        return out_put
+
+
+class NeuralNetwork:
+    def __init__(self, layers):
+        self.__layers = layers
+        self.__output = None
+
+    def get_result_net(self, input_value):
+        self.__output = self.__layers[len(self.__layers)-1].get_result_layer(input_value)
+        return self.__output
+
+    def get_result_all_neurons_in_net(self):
+        answer = []
+        for i in self.__layers:
+            for j in i.neurons:
+                answer.append(j.out_put)
+        return answer
+
+    def count_error(self, answer):
+        error = (answer-self.__output[0])**2
+        return error
+
+
+class NNManager:
+    def create_net(self, neurons_num):
+        layers_list = [self.__create_input_layer(neurons_num[0])]
+        for i in range(1, len(neurons_num)):
+            layers_list.append(self.__create_layer(neurons_num[i]))
+        return NeuralNetwork(layers_list)
+
+    def __create_layer(self, neurons_num):
+        list_of_neurons = []
+        for i in range(neurons_num):
+            list_of_neurons.append(self.__create_neuron())
+        return Layer(list_of_neurons)
+
+    def __create_input_layer(self, neurons_num):
+        list_of_neurons = []
+        for i in range(neurons_num):
+            list_of_neurons.append(self.__create_input_neuron())
+        return Layer(list_of_neurons)
+
+    @staticmethod
+    def __create_neuron():
+        return Neuron()
+
+    @staticmethod
+    def __create_input_neuron():
+        return Neuron(True)
+
+
+NUM_OF_NEURONS = [2, 2, 1]
+INPUT_VALUES = [[0, 0],
+                [0, 1],
+                [1, 0],
+                [1, 1]]
+ANSWERS = [0, 1, 1, 0]
+new_factory = NNManager()
+new_net = new_factory.create_net(NUM_OF_NEURONS)
+for i in range(len(INPUT_VALUES)):
+    print(str(new_net.get_result_net(INPUT_VALUES[i]))+" "+str(new_net.count_error(i)))
+print(new_net.get_result_all_neurons_in_net())
